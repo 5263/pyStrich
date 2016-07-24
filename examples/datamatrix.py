@@ -1,6 +1,7 @@
 """Example code for datamatrix library"""
 __revision__ = "$Revision$"
 
+import pystrich
 from pystrich.datamatrix import DataMatrixEncoder
 import sys
 import logging

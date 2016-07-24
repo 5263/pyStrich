@@ -41,13 +41,20 @@ class TextEncoder:
         self.mtx_size = 0
         self.regions = None
 
-    def encode(self, text):
+    def encode(self, text,mode='ascii'):
         """Encode the given text and add padding and error codes
         also set up the correct matrix size for the resulting codewords"""
 
         self.__init__()
-
-        self.encode_text(text)
+        if mode == 'raw':
+            self.codewords = text
+        elif mode == 'base256':
+            self.append_binary_data(text)
+        elif mode == 'ascii+base256': #ascii header followed by base256 data
+            self.encode_text(text[0])
+            self.append_binary_data(text[1])
+        else:
+            self.encode_text(text)
 
         self.pad()
 
@@ -147,6 +154,29 @@ class TextEncoder:
         """Append a single ascii character
         (the appended value is the value of the char plus 1"""
 
-        append = chr(ord(char) + 1)
+        if ord(char) & 0x80:
+            self.codewords += chr(235)
+            log.debug('ascii high bit:   "%c" ==> 235', char)
+        append = chr((ord(char) & 0x7f)+ 1)
         self.codewords += append
         log.debug('ascii:   "%c" ==> %d', char, ord(append))
+
+    def append_obfuscated(self,char):
+        r=((149*(len(self.codewords)+1)) % 255) + 1
+        append= chr((ord(char)+r) & 0xff)
+        log.debug('Base256:   "%c" (%d) ==> %d', char, r, ord(append))
+        self.codewords += append
+
+    def append_binary_data(self, string):
+        """Append a string in base 256 mode"""
+        length_high=len(string) // 250 + 249
+        length_low=len(string) % 250
+        log.debug('Base 256:   start 231')
+        self.codewords += chr(231)
+        if length_high > 249:
+            log.debug('Base 256:   length_high ==> %d', length_high)
+            self.append_obfuscated(chr(length_high))
+        log.debug('Base 256:    length_low ==> %d', length_low)
+        self.append_obfuscated(chr(length_low))
+        for char in string:
+            self.append_obfuscated(char)

@@ -45,13 +45,13 @@ class DataMatrixEncoder:
     encoding input data, placing it in the matrix and
     outputting the result"""
 
-    def __init__(self, text):
+    def __init__(self, text,mode='ascii'):
         """Set up the encoder with the input text.
         This will encode the text,
         and create a matrix with the resulting codewords"""
 
         enc = TextEncoder()
-        codewords = enc.encode(text)
+        codewords = enc.encode(text,mode)
         self.width = 0
         self.height = 0
         matrix_size = enc.mtx_size*enc.regions

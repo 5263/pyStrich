@@ -28,9 +28,10 @@ class TextEncoder:
     Adds in character set switch codes, and compresses pairs of
     digits under character set C"""
 
-    def __init__(self):
+    def __init__(self,avoid_charset_C=False):
         self.current_charset = 'B'
         self.digits = ""
+        self.avoid_charset_C = avoid_charset_C
 
     def switch_charset(self, new_charset):
         """Switch to a new character set
@@ -91,7 +92,7 @@ class TextEncoder:
 
             # Lookahead - are there lots of digits coming up?
             # If so, switch to C
-            if upcoming_digits():
+            if upcoming_digits() and not self.avoid_charset_C:
                 codes = self.switch_charset('C')
 
             # If B can't handle the next char, switch to A
@@ -106,7 +107,7 @@ class TextEncoder:
 
             # Lookahead - are there lots of digits coming up?
             # If so, switch to C
-            if upcoming_digits():
+            if upcoming_digits() and not self.avoid_charset_C:
                 codes = self.switch_charset('C')
 
             # If A can't handle the next char, switch to B

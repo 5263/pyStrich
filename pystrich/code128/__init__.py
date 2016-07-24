@@ -25,7 +25,7 @@ class Code128Encoder:
     """Top-level class which handles the overall process of
     encoding input string and outputting the result"""
 
-    def __init__(self, text, options=None):
+    def __init__(self, text, options=None,avoid_charset_C=False):
         """ The options hash currently supports three options:
             * ttf_font: absolute path to a truetype font file used to render the label
             * ttf_fontsize: the size the label is drawn in
@@ -37,7 +37,7 @@ class Code128Encoder:
         self.text = text
         self.height = 0
         self.width = 0
-        encoder = TextEncoder()
+        encoder = TextEncoder(avoid_charset_C=avoid_charset_C)
 
         self.encoded_text = encoder.encode(self.text)
         log.debug("Encoded text is %s", self.encoded_text)
